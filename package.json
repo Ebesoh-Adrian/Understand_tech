@@ -1,0 +1,30 @@
+{
+  "name": "understanding-tech",
+  "version": "1.0.0",
+  "description": "A comprehensive open source library for developers to learn technical terminology used in software engineering",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "echo 'Visit the README.md to explore technical terms'",
+    "test": "echo 'Tests coming soon'",
+    "build": "echo 'Build system coming soon'"
+  },
+  "keywords": [
+    "education",
+    "technical-terms",
+    "software-engineering",
+    "learning",
+    "developer-tools",
+    "terminology"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ebesoh-Adrian/Understand_tech.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ebesoh-Adrian/Understand_tech/issues"
+  },
+  "homepage": "https://github.com/Ebesoh-Adrian/Understand_tech#readme"
+}

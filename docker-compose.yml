@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: understand_tech
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - understand-tech-network
+
+  # MongoDB (optional, for Node Express backend)
+  mongodb:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_DATABASE: understand_tech
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - understand-tech-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - understand-tech-network
+
+  # Django Backend
+  django:
+    build:
+      context: ./backend/django-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/understand_tech
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./backend/django-api:/app
+    networks:
+      - understand-tech-network
+    command: python manage.py runserver 0.0.0.0:8000
+
+  # Flask Backend
+  flask:
+    build:
+      context: ./backend/flask-api
+    ports:
+      - "8001:5000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/understand_tech
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./backend/flask-api:/app
+    networks:
+      - understand-tech-network
+
+  # Node Express Backend
+  node:
+    build:
+      context: ./backend/node-express-api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/understand_tech
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+    volumes:
+      - ./backend/node-express-api:/app
+    networks:
+      - understand-tech-network
+    command: npm run dev
+
+  # React Frontend
+  react:
+    build:
+      context: ./frontend/react-app
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api
+    volumes:
+      - ./frontend/react-app:/app
+    networks:
+      - understand-tech-network
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: ./frontend/nextjs-app
+    ports:
+      - "3001:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    volumes:
+      - ./frontend/nextjs-app:/app
+    networks:
+      - understand-tech-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  understand-tech-network:
+    driver: bridge
